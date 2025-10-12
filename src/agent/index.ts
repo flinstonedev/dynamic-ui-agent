@@ -15,7 +15,7 @@ export interface AgentConfig {
   history?: ChatMessage[];
 }
 
-const DEFAULT_MODEL = 'gpt-5';
+const DEFAULT_MODEL = 'gpt-5-nano';
 
 function assignIdsToTree(nodes: UIElement[]): UIElement[] {
   return nodes.map((node) => {

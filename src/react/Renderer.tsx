@@ -2,6 +2,11 @@
 
 import React, { useMemo } from 'react';
 import type { UIElement, AgentResponse } from '../agent/schema.js';
+import { Button } from '../../components/ui/button.js';
+import { Input } from '../../components/ui/input.js';
+import { Label } from '../../components/ui/label.js';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card.js';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table.js';
 
 export interface RendererProps {
   response: AgentResponse;
@@ -54,57 +59,66 @@ function Node({ node, onAction }: { node: UIElement; onAction?: RendererProps['o
     }
     case 'button': {
       const { label, variant, actionId } = node.props;
+      const buttonVariant = variant === 'secondary' ? 'secondary' : variant === 'danger' ? 'destructive' : 'default';
       return (
-        <button
+        <Button
           onClick={() => actionId && onAction?.(actionId)}
-          style={buttonStyle(variant)}
+          variant={buttonVariant}
         >
           {label}
-        </button>
+        </Button>
       );
     }
     case 'input': {
       const { name, label, placeholder, inputType, value, required } = node.props as any;
       return (
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {label}
-          <input
+        <div className="space-y-2">
+          {label && <Label htmlFor={name}>{label}</Label>}
+          <Input
+            id={name}
             name={name}
             placeholder={placeholder}
             type={inputType}
             defaultValue={value as any}
             required={required}
-            style={{ padding: 8, border: '1px solid #d1d5db', borderRadius: 6 }}
           />
-        </label>
+        </div>
       );
     }
     case 'form': {
       const { title, fields, submitLabel, actionId } = node.props as any;
       return (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!actionId) return;
-            const fd = new FormData(e.currentTarget);
-            const payload = Object.fromEntries(fd.entries());
-            onAction?.(actionId, payload);
-          }}
-          style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
-        >
-          {title ? <h3>{title}</h3> : null}
-          {fields?.map((f: any) => (
-            <Node key={f.id ?? Math.random()} node={f} onAction={onAction} />
-          ))}
-          <button type="submit" style={buttonStyle('primary')}>
-            {submitLabel ?? 'Submit'}
-          </button>
-        </form>
+        <Card>
+          {title && (
+            <CardHeader>
+              <CardTitle>{title}</CardTitle>
+            </CardHeader>
+          )}
+          <CardContent>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!actionId) return;
+                const fd = new FormData(e.currentTarget);
+                const payload = Object.fromEntries(fd.entries());
+                onAction?.(actionId, payload);
+              }}
+              className="space-y-4"
+            >
+              {fields?.map((f: any) => (
+                <Node key={f.id ?? Math.random()} node={f} onAction={onAction} />
+              ))}
+              <Button type="submit" className="w-full">
+                {submitLabel ?? 'Submit'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       );
     }
     case 'list': {
       return (
-        <ul style={{ paddingLeft: 18 }}>
+        <ul className="list-disc list-inside space-y-1">
           {node.props.items.map((it: string, i: number) => (
             <li key={i}>{it}</li>
           ))}
@@ -114,57 +128,38 @@ function Node({ node, onAction }: { node: UIElement; onAction?: RendererProps['o
     case 'table': {
       const { columns, rows } = node.props as any;
       return (
-        <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <thead>
-            <tr>
-              {columns.map((c: any) => (
-                <th key={c.key} style={cellStyle(true)}>
-                  {c.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r: any, idx: number) => (
-              <tr key={idx}>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
                 {columns.map((c: any) => (
-                  <td key={c.key} style={cellStyle(false)}>
-                    {String(r[c.key] ?? '')}
-                  </td>
+                  <TableHead key={c.key}>{c.header}</TableHead>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((r: any, idx: number) => (
+                <TableRow key={idx}>
+                  {columns.map((c: any) => (
+                    <TableCell key={c.key}>{String(r[c.key] ?? '')}</TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       );
     }
     case 'code': {
       const { language, code } = node.props as any;
       return (
-        <pre style={{ background: '#0b1021', color: '#e4e7eb', padding: 12, borderRadius: 8, overflow: 'auto' }}>
+        <pre className="bg-slate-950 text-slate-100 p-4 rounded-lg overflow-auto">
           <code>{code}</code>
         </pre>
       );
     }
     default:
       return null;
-  }
-}
-
-function buttonStyle(variant: 'primary' | 'secondary' | 'danger' | undefined): React.CSSProperties {
-  const base: React.CSSProperties = {
-    padding: '8px 12px',
-    borderRadius: 6,
-    border: '1px solid transparent',
-    cursor: 'pointer',
-  };
-  switch (variant) {
-    case 'secondary':
-      return { ...base, background: 'white', borderColor: '#d1d5db', color: '#111827' };
-    case 'danger':
-      return { ...base, background: '#dc2626', color: 'white' };
-    default:
-      return { ...base, background: '#2563eb', color: 'white' };
   }
 }
 
@@ -192,16 +187,4 @@ function cssJustify(a: 'start' | 'center' | 'end' | 'between') {
     default:
       return 'flex-start';
   }
-}
-
-function cellStyle(isHeader: boolean): React.CSSProperties {
-  const base: React.CSSProperties = {
-    padding: '8px 12px',
-    border: '1px solid #e5e7eb',
-    textAlign: 'left',
-  };
-  if (isHeader) {
-    return { ...base, fontWeight: 'bold', background: '#f9fafb' };
-  }
-  return base;
 }
