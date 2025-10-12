@@ -1,10 +1,49 @@
 {
   "name": "dynamic-ui-agent",
   "version": "0.1.0",
-  "private": true,
+  "description": "A flexible AI agent library for generating structured UI components from natural language prompts",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./schema": {
+      "types": "./dist/agent/schema.d.ts",
+      "import": "./dist/agent/schema.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ai",
+    "llm",
+    "ui-generation",
+    "dynamic-ui",
+    "react",
+    "openai",
+    "zod",
+    "typescript"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/dynamic-ui-agent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/dynamic-ui-agent/issues"
+  },
+  "homepage": "https://github.com/yourusername/dynamic-ui-agent#readme",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
@@ -14,28 +53,40 @@
     "start": "next start"
   },
   "dependencies": {
+    "ai": "^3.3.34",
+    "zod": "^3.23.8"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
     "@ai-sdk/openai": "^0.0.44",
     "@ai-sdk/react": "^0.0.66",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
-    "ai": "^3.3.34",
+    "@types/node": "^24.7.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
     "lucide-react": "^0.460.0",
     "next": "^15.1.4",
+    "postcss": "^8.4.49",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^3.4.17",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@types/node": "^24.7.2",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
     "tsx": "^4.19.0",
     "typescript": "^5.6.3"
   },
