@@ -232,18 +232,6 @@ npm run typecheck
 npm run clean
 ```
 
-## Releases & Publishing
-
-1) Add NPM_TOKEN secret in your GitHub repo settings (for npm publish)
-2) Bump version in lib (pick one):
-   - npm --workspace=lib version patch
-   - npm --workspace=lib version minor
-   - npm --workspace=lib version major
-3) Push the commit and tag to trigger the workflow:
-   - git push origin HEAD --follow-tags
-
-This creates a GitHub Release and publishes lib to npm.
-
 ## License
 
 Apache 2.0 - See [LICENSE](./LICENSE)
