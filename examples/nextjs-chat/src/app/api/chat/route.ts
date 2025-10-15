@@ -1,7 +1,7 @@
 import { openai } from '@ai-sdk/openai';
 import { streamText, convertToCoreMessages } from 'ai';
-import { respond } from '../../../src/agent/index';
-import type { ChatMessage } from '../../../src/agent/schema';
+import { respond } from 'dynamic-ui-agent';
+import type { ChatMessage } from 'dynamic-ui-agent/schema';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

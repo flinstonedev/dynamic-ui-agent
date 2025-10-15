@@ -1,0 +1,70 @@
+{
+  "name": "dynamic-ui-agent",
+  "version": "0.1.0",
+  "description": "A flexible AI agent library for generating structured UI components from natural language prompts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./schema": {
+      "types": "./dist/agent/schema.d.ts",
+      "import": "./dist/agent/schema.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "ui-generation",
+    "dynamic-ui",
+    "react",
+    "openai",
+    "zod",
+    "typescript"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dynamic-ui-agent/dynamic-ui-agent.git",
+    "directory": "lib"
+  },
+  "dependencies": {
+    "ai": "^3.3.34",
+    "zod": "^3.23.8"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "typescript": "^5.6.3"
+  }
+}

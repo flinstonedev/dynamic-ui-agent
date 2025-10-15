@@ -1,243 +1,240 @@
-# Dynamic UI Agent
+# Dynamic UI Agent 🤖
 
-A lightweight wrapper around the AI SDK that takes a user prompt and returns a structured response for rendering in a React application. The agent is intended to "vibe code" interfaces by describing UI structures that you can render and iterate on with back-and-forth interactions.
-
-## Features
-
-- 🎨 **Interactive Chat Interface** - Built-in Next.js chat UI for real-time component generation
-- 📐 **Zod Schema** - Predictable, strongly-typed UI structures
-- 🤖 **AI-Powered** - Wrapper around the AI SDK's object generation
-- ⚛️ **React Renderer** - Minimal component for quick prototyping
-- 🔄 **Conversation History** - Multi-turn interactions to refine components
-- 🛠️ **Function-Based Architecture** - No classes, pure functions throughout
-
-## Getting Started
-
-### Quick Start with Chat Interface
-
-1. **Install dependencies**
-
-```bash
-npm install
-```
-
-2. **Set your OpenAI API key** (required)
-
-Create a `.env` file in the project root:
-
-```bash
-OPENAI_API_KEY=your_api_key_here
-```
-
-Or export it in your shell:
-
-```bash
-export OPENAI_API_KEY={{OPENAI_API_KEY}}
-```
-
-3. **Start the development server**
-
-```bash
-npm run dev
-```
-
-4. **Open your browser** at [http://localhost:3000](http://localhost:3000)
-
-You'll see a chat interface where you can describe UI components and watch them generate in real-time!
-
-### Try the CLI Demo
-
-To see the raw JSON output:
-
-```bash
-npm run example
-```
-
-This runs the demo in `src/examples/demo.ts` and logs the structured response.
-
-## Built-in Chat Interface
-
-The project includes a fully-functional Next.js chat interface at `/app/page.tsx`. Features include:
-
-- 💬 **Real-time chat** with the AI agent
-- 🎯 **Dynamic UI rendering** of generated components
-- 🔄 **Iterative refinement** through conversation
-- 💡 **Suggestions** for next steps
-- 📱 **Responsive design** with Tailwind CSS
-
-### Example Prompts
-
-Try these in the chat interface:
-
-- "Create a login form with email and password"
-- "Build a pricing table with 3 tiers"
-- "Make a dashboard card with stats"
-- "Design a user profile form"
-
-Then refine with follow-ups like:
-- "Add a remember me checkbox"
-- "Make the primary button red"
-- "Add validation messages"
-
-## Library Usage
-
-You can also use the Dynamic UI Agent as a library in your own projects.
-
-### Option 1: Direct function call
-
-```tsx
-import React, { useState } from 'react';
-import { respond } from './src/agent/index';
-import { DynamicUIRenderer } from './src/react/Renderer';
-import type { AgentResponse } from './src/agent/schema';
-
-export function App() {
-  const [response, setResponse] = useState<AgentResponse | null>(null);
-
-  async function handlePrompt(prompt: string) {
-    try {
-      const res = await respond(prompt);
-      setResponse(res);
-    } catch (error) {
-      console.error('Failed to generate UI:', error);
-    }
-  }
-
-  function handleAction(actionId: string, payload?: unknown) {
-    console.log('Action:', actionId, payload);
-    // Route actions back to your backend/agent for further steps
-  }
-
-  return (
-    <div>
-      <button onClick={() => handlePrompt('Create a contact form with name, email, and message.')}>Generate</button>
-      {response && <DynamicUIRenderer response={response} onAction={handleAction} />}
-    </div>
-  );
-}
-```
-
-### Option 2: Using agent factory with configuration
-
-```tsx
-import React, { useState } from 'react';
-import { createAgent } from './src/agent/index';
-import { DynamicUIRenderer } from './src/react/Renderer';
-import type { ChatMessage, AgentResponse } from './src/agent/schema';
-
-export function App() {
-  const [response, setResponse] = useState<AgentResponse | null>(null);
-  const [history, setHistory] = useState<ChatMessage[]>([]);
-
-  // Create agent with custom config
-  const agent = createAgent({
-    model: 'gpt-4o-mini',
-    history,
-  });
-
-  async function handlePrompt(prompt: string) {
-    try {
-      const res = await agent.respond(prompt);
-      setResponse(res);
-      
-      // Update history for multi-turn conversation
-      setHistory([...history, ...res.messages]);
-    } catch (error) {
-      console.error('Failed to generate UI:', error);
-    }
-  }
-
-  function handleAction(actionId: string, payload?: unknown) {
-    console.log('Action:', actionId, payload);
-  }
-
-  return (
-    <div>
-      <button onClick={() => handlePrompt('Create a contact form with name, email, and message.')}>Generate</button>
-      {response && <DynamicUIRenderer response={response} onAction={handleAction} />}
-    </div>
-  );
-}
-```
-
-## API Reference
-
-### `respond(userPrompt: string, config?: AgentConfig): Promise<AgentResponse>`
-
-Direct function to get a structured UI response from a prompt.
-
-**Parameters:**
-- `userPrompt`: The user's request
-- `config` (optional):
-  - `systemPrompt?: string` - Custom system prompt
-  - `model?: string` - Model name (default: 'gpt-4o-mini')
-  - `history?: ChatMessage[]` - Conversation history
-
-**Throws:**
-- Error if `OPENAI_API_KEY` is not set
-- Error if the API call fails
-
-### `createAgent(config?: AgentConfig)`
-
-Factory function that returns an agent object with bound configuration.
-
-**Returns:**
-- `respond(userPrompt: string)` - Generate UI from prompt
-- `getConfig()` - Get current configuration
-
-## Supported UI Elements
-
-The agent can generate the following component types:
-
-- **text** - Paragraph with variants (body, muted, caption)
-- **heading** - H1-H4 headings
-- **button** - Clickable buttons with variants (primary, secondary, danger)
-- **input** - Form inputs (text, email, password, number, date)
-- **form** - Form container with fields and submit button
-- **list** - Unordered list
-- **table** - Data table with columns and rows
-- **code** - Code block with syntax
-- **container** - Layout container with flexbox properties
+A flexible, schema-agnostic AI agent library for generating structured UI components from natural language prompts.
 
 ## Project Structure
 
 ```
 dynamic-ui-agent/
-├── app/                    # Next.js app directory
-│   ├── api/chat/          # Chat API endpoint
-│   ├── page.tsx           # Main chat interface
-│   ├── layout.tsx         # Root layout
-│   └── globals.css        # Global styles
-├── src/
-│   ├── agent/             # Core agent logic
-│   │   ├── index.ts       # Main respond() and createAgent() functions
-│   │   └── schema.ts      # Zod schemas and types
-│   ├── react/             # React components
-│   │   └── Renderer.tsx   # DynamicUIRenderer component
-│   └── examples/          # Example usage
-│       └── demo.ts        # CLI demo
-└── lib/                   # Utility functions
-    └── utils.ts           # Helper utilities
+├── lib/                  # 📦 The publishable npm package
+│   ├── src/
+│   │   ├── agent/       # Core agent logic
+│   │   └── react/       # React renderer
+│   └── dist/            # Built output
+├── examples/             # 🎨 Example applications
+│   └── nextjs-chat/     # Next.js chat demo with AI Elements
+└── docs/                 # 📚 Documentation
+    └── guides/
 ```
 
-## Scripts
+## Quick Start
 
-- `npm run dev` - Start Next.js development server
-- `npm run build` - Build the TypeScript library
-- `npm run build:next` - Build Next.js for production
-- `npm run start` - Start Next.js production server
-- `npm run example` - Run the CLI demo
-- `npm run typecheck` - Type-check without emitting files
+### Installation
 
-## Notes
+```bash
+npm install dynamic-ui-agent ai zod
+npm install @ai-sdk/openai  # or your preferred provider
+```
 
-- The schema is intentionally minimal and is a good starting point for your own design system abstractions.
-- For multi-turn interactions, maintain conversation history in your app state and pass it via the `history` config option.
-- Replace the model name by passing the `model` option to `respond()` or `createAgent()`.
-- The project uses a function-based architecture following best practices (see `REFACTORING.md` for details).
+### Basic Usage
 
-## Learn More
+```typescript
+import { respond } from 'dynamic-ui-agent';
+import { openai } from '@ai-sdk/openai';
 
-- See `WARP.md` for detailed development guidance
-- Check `REFACTORING.md` for architecture decisions
-- Explore the `/app` directory for the chat interface implementation
+// Generate a login form
+const response = await respond('Create a login form with email and password', {
+  llm: {
+    provider: openai,
+    model: 'gpt-4o-mini',
+    temperature: 1,
+  }
+});
+
+console.log(response.ui); // Array of structured UI elements
+```
+
+## Examples
+
+### 1. Simple Form Generation
+
+```typescript
+import { respond } from 'dynamic-ui-agent';
+import { openai } from '@ai-sdk/openai';
+
+const formResponse = await respond('Create a contact form with name, email, and message fields', {
+  llm: { provider: openai, model: 'gpt-4o-mini' }
+});
+
+// Returns structured UI with form elements
+console.log(formResponse.ui);
+```
+
+### 2. Custom Schema (Non-UI Data)
+
+```typescript
+import { respond } from 'dynamic-ui-agent';
+import { z } from 'zod';
+import { anthropic } from '@ai-sdk/anthropic';
+
+// Define your own schema
+const RecipeSchema = z.object({
+  name: z.string(),
+  ingredients: z.array(z.object({
+    item: z.string(),
+    amount: z.string(),
+  })),
+  steps: z.array(z.string()),
+  cookTime: z.number(),
+});
+
+const recipe = await respond('Create a chocolate chip cookie recipe', {
+  schema: RecipeSchema,
+  llm: {
+    provider: anthropic,
+    model: 'claude-3-5-sonnet-20241022',
+  }
+});
+
+console.log(recipe.name); // Fully typed!
+```
+
+### 3. React Component with Renderer
+
+```typescript
+import { DynamicUIRenderer } from 'dynamic-ui-agent/react';
+import { respond } from 'dynamic-ui-agent';
+import { useState, useEffect } from 'react';
+
+function MyApp() {
+  const [response, setResponse] = useState(null);
+
+  useEffect(() => {
+    respond('Create a pricing table with 3 tiers')
+      .then(setResponse);
+  }, []);
+
+  const handleAction = (actionId: string, payload?: any) => {
+    console.log('User action:', actionId, payload);
+  };
+
+  return response && (
+    <DynamicUIRenderer 
+      response={response}
+      onAction={handleAction}
+    />
+  );
+}
+```
+
+### 4. Multi-turn Conversation with History
+
+```typescript
+import { createAgent } from 'dynamic-ui-agent';
+import { openai } from '@ai-sdk/openai';
+
+const agent = createAgent({
+  systemPrompt: 'You are a helpful UI designer',
+  llm: { provider: openai, model: 'gpt-4o' },
+  history: [],
+});
+
+// First request
+const response1 = await agent.respond('Create a user profile form');
+
+// Follow-up request (maintains context)
+const response2 = await agent.respond('Add a profile picture upload field');
+```
+
+### 5. Next.js API Route
+
+```typescript
+// app/api/chat/route.ts
+import { respond } from 'dynamic-ui-agent';
+import { openai } from '@ai-sdk/openai';
+import type { ChatMessage } from 'dynamic-ui-agent/schema';
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+  
+  const lastMessage = messages[messages.length - 1];
+  const history: ChatMessage[] = messages.slice(0, -1).map((msg: any) => ({
+    role: msg.role,
+    content: msg.content,
+  }));
+
+  const agentResponse = await respond(lastMessage.content, {
+    llm: { provider: openai, model: 'gpt-4o-mini' },
+    history
+  });
+
+  return Response.json(agentResponse);
+}
+```
+
+### 6. Different LLM Providers
+
+```typescript
+import { respond } from 'dynamic-ui-agent';
+import { openai } from '@ai-sdk/openai';
+import { anthropic } from '@ai-sdk/anthropic';
+import { google } from '@ai-sdk/google';
+
+// OpenAI
+const openaiResult = await respond('Create a dashboard', {
+  llm: { provider: openai, model: 'gpt-4o' }
+});
+
+// Anthropic Claude
+const claudeResult = await respond('Create a dashboard', {
+  llm: { provider: anthropic, model: 'claude-3-5-sonnet-20241022' }
+});
+
+// Google Gemini
+const geminiResult = await respond('Create a dashboard', {
+  llm: { provider: google, model: 'gemini-1.5-pro' }
+});
+```
+
+## Running the Demo
+
+```bash
+# Install dependencies (using npm workspaces)
+npm install
+
+# Build the library
+npm run build
+
+# Run the Next.js demo
+npm run dev
+```
+
+The demo will start at [http://localhost:3000](http://localhost:3000)
+
+## Documentation
+
+- **[Library Documentation](./lib/README.md)** - How to use the library
+- **[Schema to UI Guide](./docs/guides/SCHEMA-TO-UI.md)** - Understanding the architecture
+- **[Development Guide](./docs/DEVELOPMENT.md)** - Contributing and development setup
+
+## What's Included
+
+### Library (`lib/`)
+- Flexible agent API supporting any Zod schema
+- Multiple LLM provider support (OpenAI, Anthropic, etc.)
+- Built-in UI schema with common components
+- React renderer with shadcn/ui components
+- TypeScript types and comprehensive exports
+
+### Demo (`examples/nextjs-chat/`)
+- Full-featured chat interface using Vercel AI SDK
+- Dynamic UI component generation
+- Interactive form handling
+- Modern styling with Tailwind CSS and shadcn/ui
+
+## Development
+
+```bash
+# Build the library
+npm run build
+
+# Type-check all workspaces
+npm run typecheck
+
+# Clean all build artifacts
+npm run clean
+```
+
+## License
+
+Apache 2.0 - See [LICENSE](./LICENSE)

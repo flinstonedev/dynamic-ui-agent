@@ -33,6 +33,7 @@ const UIForm = z.object({
   }),
 });
 
+// Core UI element schema (strict per-element)
 export const UIElementSchema: any = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('text'),
@@ -53,11 +54,19 @@ export const UIElementSchema: any = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('button'),
     id: z.string().optional(),
-    props: z.object({
-      label: z.string(),
-      variant: z.enum(['primary', 'secondary', 'danger']).default('primary'),
-      actionId: z.string().optional(),
-    }),
+    props: z
+      .object({
+        // Accept either label or text from the model and normalize to label
+        label: z.string().optional(),
+        text: z.string().optional(),
+        variant: z.enum(['primary', 'secondary', 'danger']).default('primary'),
+        actionId: z.string().optional(),
+      })
+      .transform((p) => ({
+        label: (p as any).label ?? (p as any).text ?? 'Button',
+        variant: (p as any).variant ?? 'primary',
+        actionId: (p as any).actionId,
+      })),
   }),
   UIInput,
   UIForm,
@@ -78,7 +87,8 @@ export const UIElementSchema: any = z.discriminatedUnion('type', [
           header: z.string(),
         })
       ),
-      rows: z.array(z.record(z.any())),
+      // Default to empty array so missing rows do not cause validation failures
+      rows: z.array(z.record(z.any())).default([]),
     }),
   }),
   z.object({
@@ -103,6 +113,18 @@ export const UIElementSchema: any = z.discriminatedUnion('type', [
 ]);
 export type UIElement = z.infer<typeof UIElementSchema>;
 
+// Tolerant UI array schema: drops non-object items before validation
+const UIArraySchema = z.preprocess((val: unknown) => {
+  if (Array.isArray(val)) {
+    return val.filter((item: any) => {
+      if (typeof item !== 'object' || item === null) return false;
+      // Keep only entries that look like UI elements: must have a string 'type'
+      return typeof item.type === 'string';
+    });
+  }
+  return [];
+}, z.array(UIElementSchema).default([]));
+
 export const UIActionSchema = z.object({
   id: z.string(),
   type: z.enum(['submit', 'navigate', 'open_url', 'emit_event', 'call']),
@@ -115,7 +137,7 @@ export const AgentResponseSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   messages: z.array(ChatMessageSchema).default([]),
-  ui: z.array(UIElementSchema).default([]),
+  ui: UIArraySchema,
   actions: z.array(UIActionSchema).default([]),
   suggestions: z.array(z.string()).default([]),
   followUpQuestion: z.string().optional(),
@@ -139,4 +161,26 @@ IMPORTANT: For form elements, each field in the 'fields' array MUST be a complet
       }
     ]
   }
-}`;
+}
+
+For dashboard cards or stat displays, use containers with nested heading and text components. Example:
+{
+  "type": "container",
+  "props": {
+    "direction": "row",
+    "gap": 16
+  },
+  "children": [
+    {
+      "type": "container",
+      "props": {"direction": "column", "gap": 8},
+      "children": [
+        {"type": "heading", "props": {"text": "Total Users", "level": 3}},
+        {"type": "text", "props": {"text": "1,234", "variant": "body"}},
+        {"type": "text", "props": {"text": "+12% from last month", "variant": "muted"}}
+      ]
+    }
+  ]
+}
+
+Always populate containers with relevant children. Never return empty containers unless explicitly requested.`;

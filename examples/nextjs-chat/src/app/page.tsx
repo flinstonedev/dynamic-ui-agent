@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { DynamicUIRenderer } from '../src/react/Renderer';
-import type { AgentResponse } from '../src/agent/schema';
+import { DynamicUIRenderer } from 'dynamic-ui-agent/react';
+import type { AgentResponse } from 'dynamic-ui-agent/schema';
 import { Send, Sparkles } from 'lucide-react';
 
 interface Message {
