@@ -42,7 +42,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dynamic-ui-agent/dynamic-ui-agent.git",
+    "url": "https://github.com/flinstonedev/dynamic-ui-agent.git",
     "directory": "lib"
   },
   "dependencies": {
