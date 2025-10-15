@@ -25,8 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Typecheck
-        run: npm --workspace=lib run typecheck
+      - name: Typecheck (lib only)
+        working-directory: lib
+        run: tsc --noEmit
 
       - name: Build library
         run: npm --workspace=lib run build
