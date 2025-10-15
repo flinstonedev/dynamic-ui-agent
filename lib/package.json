@@ -1,6 +1,6 @@
 {
   "name": "dynamic-ui-agent",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A flexible AI agent library for generating structured UI components from natural language prompts",
   "type": "module",
   "main": "./dist/index.js",
