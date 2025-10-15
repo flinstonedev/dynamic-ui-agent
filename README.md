@@ -13,8 +13,7 @@ dynamic-ui-agent/
 │   └── dist/            # Built output
 ├── examples/             # 🎨 Example applications
 │   └── nextjs-chat/     # Next.js chat demo with AI Elements
-└── docs/                 # 📚 Documentation
-    └── guides/
+└── .github/              # GitHub workflows (release/publish)
 ```
 
 ## Quick Start
@@ -203,9 +202,7 @@ The demo will start at [http://localhost:3000](http://localhost:3000)
 
 ## Documentation
 
-- **[Library Documentation](./lib/README.md)** - How to use the library
-- **[Schema to UI Guide](./docs/guides/SCHEMA-TO-UI.md)** - Understanding the architecture
-- **[Development Guide](./docs/DEVELOPMENT.md)** - Contributing and development setup
+- **[Library Documentation](./lib/README.md)** - Full library usage and API
 
 ## What's Included
 
@@ -234,6 +231,18 @@ npm run typecheck
 # Clean all build artifacts
 npm run clean
 ```
+
+## Releases & Publishing
+
+1) Add NPM_TOKEN secret in your GitHub repo settings (for npm publish)
+2) Bump version in lib (pick one):
+   - npm --workspace=lib version patch
+   - npm --workspace=lib version minor
+   - npm --workspace=lib version major
+3) Push the commit and tag to trigger the workflow:
+   - git push origin HEAD --follow-tags
+
+This creates a GitHub Release and publishes lib to npm.
 
 ## License
 
