@@ -46,7 +46,7 @@
     "directory": "lib"
   },
   "dependencies": {
-    "ai": "^3.3.34",
+    "ai": "^5.0.113",
     "zod": "^3.23.8"
   },
   "peerDependencies": {
